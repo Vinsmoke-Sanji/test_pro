@@ -13,3 +13,5 @@ loop = asyncio.get_event_loop()
 loop.run_until_complete(coroutine)
 
 print('TIME:', now() - start)
+print('now:',time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time()))
+)
