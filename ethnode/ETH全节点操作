@@ -1,0 +1,40 @@
+### 以太坊全节点操作  
+[节点操作链接](https://www.cnblogs.com/elvi/p/10203930.html)  
+#### 安装  
+- 下载页面  
+查看最新版本 https://geth.ethereum.org/downloads/  
+下载压缩包 `cd /data`  
+`wget https://gethstore.blob.core.windows.net/builds/geth-linux-amd64-1.8.27-4bcc0a37.tar.gz`  
+- 解压  
+`tar -zxvf geth-linux-amd64-1.8.27-4bcc0a37.tar.gz`  
+- 软连接  
+`ln -fs /data/geth-linux-amd64-1.8.27-4bcc0a37 /data/geth`  
+`ln -fs /data/geth-linux-amd64-1.8.27-4bcc0a37/geth  /usr/local/bin/`  
+- 检查  
+`geth version`  
+
+#### 启动  
+nohup启动为后台启动，输出日志在nohup.out，可以直接geth启动  
+`nohup geth --rpc --rpcapi web3,eth,net,db,personal --rpcaddr 0.0.0.0 --rpcport 8545 --datadir "/data/ethData"`  
+默认date目录在 ~/.ethereum/  
+可添加参数指定 - -datadir "/data/ethData"  
+
+####geth客户端登录操作  
+- 登录  
+`geth attach rpc:http://127.0.0.1:8545`  
+- 查看状态  
+`eth`
+- 查看最新区块高度  
+`eth.blockNumber`  
+- 查看同步状态，返回 false 未同步或同步到最新了  
+`eth.syncing`  
+
+#### geth更改同步模式  
+[操作链接1](https://blog.csdn.net/wo541075754/article/details/78360560)  
+[操作链接2](https://blog.csdn.net/guokaikevin/article/details/79254785)  
+
+- 改为full模式  
+先将nohup运行的geth客户端进程杀死  
+`kill -9 进程id`  
+运行客户端  
+`geth --rpc --rpcapi web3,eth,net,db,personal --rpcaddr 0.0.0.0 --rpcport 8545 --datadir "/data/ethData" –syncmode full`  

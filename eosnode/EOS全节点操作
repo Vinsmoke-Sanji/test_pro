@@ -1,0 +1,67 @@
+### EOS全节点操作  
+#### 安装mongodb  
+可选项 `eosio::mongo_db_plugin` 将区块链数据存档到MongoDB中  
+
+- 安装教程  
+[1](https://www.runoob.com/mongodb/mongodb-linux-install.html)  
+[2](https://www.cnblogs.com/evercx/p/5327440.html)  
+- 下载  
+`wget https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-ubuntu1604-4.0.10.tgz`  
+- 解压  
+`tar -zxvf mongodb-linux-x86_64-ubuntu1604-4.0.10.tgz`  
+- 将解压包拷贝到指定目录  
+`mv mongodb-linux-x86_64-ubuntu1604-4.0.10/ /usr/local/mongodb`  
+- 创建数据目录  
+`mkdir -p /disk/disk3/mongodb/data`  
+- 配置文件  
+启动服务要指定数据库数据和日志路径,为方便起见,将参数写入mongodb.conf文件  
+`vim /usr/local/mongodb/bin/mongodb.conf`
+
+```
+dbpath=/disk/disk3/mongodb/data  
+logpath=/disk/disk3/mongodb/data/mongodb.log
+logappend=true
+```
+- 启动mongo服务  
+`-f` 指定配置文件，`&` 让服务后台运行  
+`mongod -f mongodb.conf &`  
+- mongodb shell  
+`/usr/local/mongodb/bin/./mongo`  
+建立软连接，不管在哪个目录下，如果想要进入MongoDB的shell，输入 `mongo` 命令就可以了  
+`sudo ln -s /usr/local/mongodb/bin/./mongo /bin/mongo`  
+
+#### 安装EOS节点软件  
+[操作链接1](https://developers.eos.io/eosio-nodeos/docs/running-nodeos)  
+[操作链接2](https://blog.csdn.net/shebao3333/article/details/87886737)  
+[操作链接3](https://www.cnblogs.com/elvi/p/10205785.html)  
+[操作链接4](https://blog.csdn.net/agecntao/article/details/81220018)  
+软件最新版本地址 https://github.com/eosio/eos/releases  
+
+- 下载安装  
+如果安装过节点软件，需要先卸载之前安装的版本  
+查看版本信息 `nodeos --version`  
+删除 `sudo apt remove eosio`  
+`cd /disk/disk3/eos`  
+获取 `wget https://github.com/EOSIO/eos/releases/download/v1.7.0/eosio_1.7.0-1-ubuntu-16.04_amd64.deb`  
+安装 `sudo apt install ./eosio_1.7.0-1-ubuntu-16.04_amd64.deb`  
+- 配置  
+EOS节点要接入主网，需要在初次启动 nodeos 时指定主网的创世文件 genesis.json ，配置文件 config.ini  
+`git clone https://github.com/CryptoLions/EOS-MainNet.git`  
+最新可用同步节点清单下载  
+`wget https://eosnodes.privex.io/?config=1`  
+在配置文件 config.ini 中，找到所有的 `p2p-peer-address` 配置项，然后用index.html?config=1.text中的内容替换  
+EOS MongoDB 支持，修改 config.ini 配置文件，添加如下两行：  
+`plugin = eosio::mongo_db_plugin`  
+`mongodb-uri = mongodb://localhost:27017/eosmain`  
+其中，eosmain 是要写入的 MongoDB 数据库名。  
+- 启动  
+首次启动，需要指定创世文件，清除现有区块并加入主网  
+`nodeos --config-dir . --genesis-json genesis.json --delete-all-blocks`  
+- 节点停止与重新启动  
+重新启动 nodeos ，切记不要强制杀掉 nodeos ，应当用如下的命令通知 nodeos 退出：  
+`pkill nodeos`  
+这样关闭的 nodeos 不会有历史垃圾，因此再次启动时会很顺利：  
+`nodeos --config-dir .`  
+- 查询  
+启动之后，查看同步进度：  
+`cleos get info`  

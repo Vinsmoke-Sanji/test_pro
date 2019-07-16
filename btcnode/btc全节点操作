@@ -1,0 +1,61 @@
+###比特币全节点操作
+
+[参考链接1](https://www.cnblogs.com/elvi/p/10203927.html)  
+[参考链接2](https://blog.csdn.net/qq_38961394/article/details/82315629)  
+[参考链接3](https://blog.csdn.net/littlesmallless/article/details/83825784)  
+####安装  
+ - 下载页面  
+https://bitcoin.org/zh_CN/download  
+`cd /disk/disk3/btc`  
+下载压缩包：`wget https://bitcoincore.org/bin/bitcoin-core-0.18.0/bitcoin-0.18.0-x86_64-linux-gnu.tar.gz`  
+- 解压  
+`tar -zxvf bitcoin-0.18.0-x86_64-linux-gnu.tar.gz`  
+- 创建数据目录  
+`mkdir btcData`  
+- 创建配置文件  
+bitcoin的默认配置目录为 ~/.bitcoin/bitcoin.conf，填写以下配置  
+`mkdir ~/.bitcoin`  
+`vim ~/.bitcoin/bitcoin.conf`
+
+```
+# ~/.bitcoin/bitcoin.conf
+datadir=/disk/disk3/btc/btcData
+dbcache=10240
+txindex=1
+rpcuser=btc
+rpcpassword=btc2019
+daemon=1
+server=1
+rest=1
+rpcbind=0.0.0.0:8332
+rpcallowip=0.0.0.0/0
+deprecatedrpc=accounts
+``` 
+
+- 配置说明：  
+datadir 表示BTC同步区块数据时的数据存放目录  
+rpcuser 远程访问的认证用户  
+rpcpassword 远程访问密码  
+daemon      在后台运行  
+rpcallowip  指定哪些IP可以通过远程的方式访问BTC区块链的API接口  
+txindex     表示是否开启交易信息查询功能，如果没有改选项，则在区块数据同步完成之后，无法查询到非本链上的交易记录    
+deprecatedrpc=accounts 启用账户"account"API ,V0.18版将被完全移除,新版"标签-label"API
+
+ - 后台启动  
+`cd /disk/disk3/btc/bitcoin-0.18.0/bin`  
+`./bitcoind -daemon`  
+Bitcoin server starting  
+- 关闭服务  
+`./bitcoin-cli stop`  
+
+####查看区块同步  
+`cd /disk/disk3/btc/bitcoin-0.18.0/bin`  
+`./bitcoin-cli getblockchaininfo`  
+####rpc api访问  
+[api链接](http://chainquery.com/bitcoin-api/getblockcount)  
+
+返回最长区块链中的块数  
+`curl --user btc:btc2019 --data-binary '{"jsonrpc": "1.0", "id":"curltest", "method": "getblockcount", "params": [] }' -H 'content-type: text/plain;' http://127.0.0.1:8332/`  
+
+返回包含有关区块链处理的各种状态信息的对象  
+`curl --user btc:btc2019 --data-binary '{"jsonrpc": "1.0", "id":"curltest", "method": "getblockchaininfo", "params": [] }' -H 'content-type: text/plain;' http://127.0.0.1:8332/`

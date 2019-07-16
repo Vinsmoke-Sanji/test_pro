@@ -1,0 +1,115 @@
+### 波场全节点操作
+
+[节点操作链接](https://cn.developers.tron.network/docs/tron-cli#section-tron-cli-)
+
+#### 依赖
+- Python 3.7+
+- JDK 1.8
+- MongoDB (用于事件服务器) 
+
+#### 安装
+在目标目录中，可以选择设置 python 虚拟环境并激活环境。然后执行 troncli 的 pip 安装。 
+
+```
+python3 -m venv venv    #如果用python3.7,命令为：python3 -m venv py3venv --without-pip
+
+. ./venv/bin/activate   #3.7,命令：source ./py3venv/bin/activate
+
+pip install troncli   #同时存在python2和3的pip时指定：python3 -m pip install troncli
+```
+
+虚拟环境中成功的 “pip install”之后，输入`tron-cli`有tron服务提示即安装成功
+
+#### tron-cli主网
+以下过程允许高级用户自定义其设置并连接到 Mainnet。该过程包括初始化，设置配置和运行节点
+
+- 初始化 
+
+运行 'tron-cli init' 命令设置目录，下载 .jar 文件，并将 .jar 文件移动到目录中：
+
+`tron-cli init`
+
+该命令在工作目录中创建一个名为 tron_nodes 的目录，然后创建四个文件夹 fullnode，soliditynode，eventnode 和 gridapi。然后该命令下载 full.jar 和 solidity.jar，并将这些可执行文件放在各自的文件夹中。
+
+- 配置
+
+查看当前tron-cli配置：
+
+`tron-cli config`
+
+配置 Full 和 Solidity 节点的 HTTP 和 gRPC IP 端口。默认设置为：
+
+```
+Full Node HTTP: 8500
+Solidity Node HTTP: 8600
+Full Node RPC: 58500
+Solidity Node RPC: 58600
+Event-Node RPC: 58400
+Event-Node HTTP: 8400
+```
+
+要自定义设置，只需执行`tron-cli config --nettype`命令即可。例如，要将 Full Node HTTP 端口设置为 8090，运行`tron-cli config --fullhttpport 8090`
+
+配置中的 net type set to 参数为 private 时是本地私有节点，将其设置成 main 为主网同步节点，运行：
+
+`tron-cli config --nettype main` 
+
+- 同步主网数据设置： 
+
+在官网下载压缩包，解压后将 `database` 和 `index` 文件夹替换原来的文件夹 
+
+配置文件 `full.conf` 中修改： 
+
+```
+{net: {type: "mainnet"},
+
+storage: {db.version: 2, db.directory: "database", index.directory: "index", index.switch: "on", db.sync: "true", transHistory.switch: "on", properties: []},
+
+node.discovery: {enable: "true", persist: "true", bind.ip: "", external.ip: "null"},
+
+node.backup: {port: 10001, priority: 8, members: []},
+```
+
+- 运行节点
+
+要启动完整节点，运行：
+
+`tron-cli run --nodetype full`
+
+然后，可以使用 `tron-cli status` 检查整个节点状态
+
+- 停止节点
+
+运行以下命令可以停止节点正在运行的端口：
+
+`tron-cli stop --node NODENUMBER`
+
+NODENUMBER为具体端口号
+
+要直接停止所有tron-cli服务端口，运行：
+
+`tron-cli stop`
+
+#### 节点操作和api调用
+
+[api链接](https://developers.tron.network/reference#query-network)
+
+- 获取最新区块
+
+`curl -X POST  https://api.trongrid.io/wallet/getnowblock`
+
+本地：
+
+`curl -X POST  http://127.0.0.1:8500/wallet/getnowblock`  
+
+`curl -X POST http://127.0.0.1:8500/wallet/getnodeinfo`  
+
+`` 
+
+####调试 
+
+同步过程如果停在某一块不再向下进行，到官方github下载最新版本jar包和最新配置，替换原来的文件，地址： 
+
+[jar](https://github.com/tronprotocol/java-tron/releases) 
+
+[conf](https://github.com/tronprotocol/tron-deployment/blob/master/main_net_config.conf)
